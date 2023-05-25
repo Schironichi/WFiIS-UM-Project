@@ -1,5 +1,7 @@
 import pygame
 
+# vvv Boring part vvv
+
 # Initialize Pygame
 pygame.init()
 positions = [30, 172, 397, 319, 402, 76, 80, 504, 45, 88, 539, 246, 563, 60, 
@@ -10,6 +12,16 @@ positions = [30, 172, 397, 319, 402, 76, 80, 504, 45, 88, 539, 246, 563, 60,
                    304, 303, 373, 99, 323, 114, 284, 374, 498, 624, 565, 456, 472, 357, 
                    638, 111, 65, 431, 574, 297, 231, 455, 269, 473, 267, 572, 98, 457, 
                    46, 495, 63, 187, 352, 302, 178, 31, 292, 285]
+
+# Actions
+NO_ACTION = 0
+LEFT_ACTION = 1
+RIGHT_ACTION = 2
+
+    #player.right < obstacle_right
+    #player.left > obstacle_left
+    #if obstacle_height = 0 do not move 
+
 
 # Set the window dimensions
 WINDOW_WIDTH = 800
@@ -35,22 +47,20 @@ PLAYER_X = WINDOW_WIDTH // 2
 PLAYER_Y = 0
 
 # Set the obstacle dimensions and speed
-OBSTACLE_WIDTH = 50
+OBSTACLE_WIDTH = 100
 OBSTACLE_HEIGHT = 50
 OBSTACLE_SPEED = 2
 
 # Set the number of obstacles
 NUM_OBSTACLES = 2
 
-# Load the player image and scale it to the desired size
-player_image = pygame.image.load('Kratos.png')
-player_image = pygame.transform.scale(player_image, (PLAYER_WIDTH, PLAYER_HEIGHT))
 
 # Create the player sprite class
 class Player(pygame.sprite.Sprite):
     def __init__(self, x, y):
         super().__init__()
-        self.image = player_image
+        self.image = pygame.image.load('Kratos.png')
+        self.image = pygame.transform.scale(self.image, (PLAYER_WIDTH, PLAYER_HEIGHT))
         self.rect = self.image.get_rect()
         self.rect.x = x
         self.rect.y = y
@@ -62,13 +72,19 @@ all_sprites.add(player)
 
 # Create the obstacles
 obstacle_rects = []
+
+# first obstacle
 obstacle_rects.append([
+    # left part
     pygame.Rect(0, WINDOW_HEIGHT // 2, positions[0], OBSTACLE_HEIGHT),
-    pygame.Rect(positions[0] + 2 * OBSTACLE_WIDTH, WINDOW_HEIGHT // 2, WINDOW_WIDTH - 2 * OBSTACLE_WIDTH, OBSTACLE_HEIGHT)
+    # right part
+    pygame.Rect(positions[0] + OBSTACLE_WIDTH, WINDOW_HEIGHT // 2, WINDOW_WIDTH - OBSTACLE_WIDTH, OBSTACLE_HEIGHT)
 ])
+
+# second obstacle
 obstacle_rects.append([
     pygame.Rect(0, WINDOW_HEIGHT, positions[1], OBSTACLE_HEIGHT),
-    pygame.Rect(positions[1] + 2 * OBSTACLE_WIDTH, WINDOW_HEIGHT, WINDOW_WIDTH - 2 * OBSTACLE_WIDTH, OBSTACLE_HEIGHT)
+    pygame.Rect(positions[1] + OBSTACLE_WIDTH, WINDOW_HEIGHT, WINDOW_WIDTH - OBSTACLE_WIDTH, OBSTACLE_HEIGHT)
 ])
 
 # Set the initial score and game over flag
@@ -78,46 +94,20 @@ game_over = False
 # Create the game window
 screen = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
 
-# Game loop
-while not game_over:
 
-    # Handle events
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            game_over = True
 
-    # Handle input
-    keys = pygame.key.get_pressed()
-    if keys[pygame.K_a]:
-        if player.rect.left > 7:
-            player.rect.move_ip(-8, 0)
-    if keys[pygame.K_d]:
-        if player.rect.right < WINDOW_WIDTH - 7:
-            player.rect.move_ip(8, 0)
 
-    # Move the obstacles down
-    for obstacle_rect in obstacle_rects:
-        obstacle_rect[0].move_ip(0, -OBSTACLE_SPEED)
-        obstacle_rect[1].move_ip(0, -OBSTACLE_SPEED)
-
-        # Check for collisions
-        if player.rect.colliderect(obstacle_rect[0]) or player.rect.colliderect(obstacle_rect[1]) or score == 100:
-            game_over = True
-
-        # If the obstacle goes off the screen, move it back to the top
-        if obstacle_rect[0].bottom <= 0 and not game_over:
-            score += 1
-            obstacle_rect[0] = pygame.Rect(0, WINDOW_HEIGHT, positions[score + 2], OBSTACLE_HEIGHT)
-            obstacle_rect[1] = pygame.Rect(positions[score + 2] + 2 * OBSTACLE_WIDTH, WINDOW_HEIGHT, WINDOW_WIDTH - 2 * OBSTACLE_WIDTH, OBSTACLE_HEIGHT)
-
+# draws and update screen
+def draw(obstacles, player):
     # Clear the screen
     screen.fill(BLACK)
 
     # Draw the player
-    all_sprites.draw(screen)
+    #all_sprites.draw(screen)
+    pygame.draw.rect(screen, BLUE, player.rect)
 
     # Draw the obstacles
-    for obstacle_rect in obstacle_rects:
+    for obstacle_rect in obstacles:
         pygame.draw.rect(screen, GRAY, obstacle_rect[0])
         pygame.draw.rect(screen, GRAY, obstacle_rect[1])
 
@@ -127,6 +117,68 @@ while not game_over:
 
     # Update the screen
     pygame.display.update()
+
+def update_gamestate(obstacles, score):
+    # Move the obstacles down
+    game_over = False
+    for obstacle_rect in obstacles:
+        obstacle_rect[0].move_ip(0, -OBSTACLE_SPEED)
+        obstacle_rect[1].move_ip(0, -OBSTACLE_SPEED)
+
+        # Check for collisions
+        if player.rect.colliderect(obstacle_rect[0]) or player.rect.colliderect(obstacle_rect[1]) or score == 100:
+            game_over = True
+
+        # If the obstacle goes off the screen, move it back to the bottom delete obst and create a new one at the bottom
+        if obstacle_rect[0].bottom <= 0 and not game_over:
+            score += 1
+            obstacles.pop(0)
+            obstacles.append([
+                # left part
+                pygame.Rect(0, WINDOW_HEIGHT, positions[score+1], OBSTACLE_HEIGHT),
+                # right part
+                pygame.Rect(positions[score+1] + OBSTACLE_WIDTH, WINDOW_HEIGHT, WINDOW_WIDTH - OBSTACLE_WIDTH, OBSTACLE_HEIGHT)
+            ])
+            
+    return game_over, score, obstacles
+
+def player_input_handler(keys):
+    # Handle input
+    if keys[pygame.K_a]:
+        if player.rect.left > 7:
+            player.rect.move_ip(-8, 0)
+    if keys[pygame.K_d]:
+        if player.rect.right < WINDOW_WIDTH - 7:
+            player.rect.move_ip(8, 0)
+
+def event_handler(events):
+    # Handle events
+    game_over = False
+    for event in events:
+        if event.type == pygame.QUIT:
+            game_over = True
+    return game_over
+
+def get_positions():
+    obstacle_left = positions[score]
+    obstacle_right = obstacle_left + OBSTACLE_WIDTH
+    obstacle_height = obstacle_rects[0][0].y if obstacle_rects[0][0].y >= 0 else 0
+
+    print(f"Player.left: {player.rect.x} Player.right: {player.rect.x + PLAYER_WIDTH} Obst wysokosc: {obstacle_height}  Obst left: {obstacle_left}  Obst right: {obstacle_right}")
+
+# Game loop
+while not game_over:
+
+
+    get_positions()
+
+    game_over = event_handler(pygame.event.get())
+
+    player_input_handler(pygame.key.get_pressed())
+
+    game_over, score, obstacle_rects = update_gamestate(obstacle_rects, score)
+
+    draw(obstacle_rects, player)
 
     # Set the game clock tick rate
     clock.tick(60)
