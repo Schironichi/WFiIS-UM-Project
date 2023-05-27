@@ -25,7 +25,7 @@ BLUE = (0, 0, 255)
 # Set the font
 FONT = pygame.font.Font(None, 36)
 
-# Set the game clock
+# Set the games clock
 clock = pygame.time.Clock()
 
 # Set the player dimensions and position
@@ -43,7 +43,7 @@ OBSTACLE_SPEED = 5
 NUM_OBSTACLES = 5
 
 # Load the player image and scale it to the desired size
-player_image = pygame.image.load('Kratos.png')
+player_image = pygame.image.load('data/Kratos.png')
 player_image = pygame.transform.scale(player_image, (PLAYER_WIDTH, PLAYER_HEIGHT))
 
 # Create the player sprite class
@@ -69,11 +69,11 @@ for i in range(NUM_OBSTACLES):
     counter -= 1
     obstacle_rects.append(pygame.Rect(obstacle_x, obstacle_y, OBSTACLE_WIDTH, OBSTACLE_HEIGHT))
 
-# Set the initial score and game over flag
+# Set the initial score and games over flag
 score = 0
 game_over = False
 
-# Create the game window
+# Create the games window
 screen = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
 
 # Game loop
@@ -124,8 +124,8 @@ while not game_over:
     # Update the screen
     pygame.display.update()
 
-    # Set the game clock tick rate
+    # Set the games clock tick rate
     clock.tick(60)
 
-# End the game
+# End the games
 pygame.quit()

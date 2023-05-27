@@ -13,10 +13,7 @@ positions = [30, 172, 397, 319, 402, 76, 80, 504, 45, 88, 539, 246, 563, 60,
                    638, 111, 65, 431, 574, 297, 231, 455, 269, 473, 267, 572, 98, 457, 
                    46, 495, 63, 187, 352, 302, 178, 31, 292, 285]
 
-# Actions
-NO_ACTION = 0
-LEFT_ACTION = 1
-RIGHT_ACTION = 2
+
 
     #player.right < obstacle_right
     #player.left > obstacle_left
@@ -37,7 +34,7 @@ BLUE = (0, 0, 255)
 # Set the font
 FONT = pygame.font.Font(None, 36)
 
-# Set the game clock
+# Set the games clock
 clock = pygame.time.Clock()
 
 # Set the player dimensions and position
@@ -59,7 +56,7 @@ NUM_OBSTACLES = 2
 class Player(pygame.sprite.Sprite):
     def __init__(self, x, y):
         super().__init__()
-        self.image = pygame.image.load('Kratos.png')
+        self.image = pygame.image.load('data/Kratos.png')
         self.image = pygame.transform.scale(self.image, (PLAYER_WIDTH, PLAYER_HEIGHT))
         self.rect = self.image.get_rect()
         self.rect.x = x
@@ -87,11 +84,11 @@ obstacle_rects.append([
     pygame.Rect(positions[1] + OBSTACLE_WIDTH, WINDOW_HEIGHT, WINDOW_WIDTH - OBSTACLE_WIDTH, OBSTACLE_HEIGHT)
 ])
 
-# Set the initial score and game over flag
+# Set the initial score and games over flag
 score = 0
 game_over = False
 
-# Create the game window
+# Create the games window
 screen = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
 
 
@@ -180,8 +177,8 @@ while not game_over:
 
     draw(obstacle_rects, player)
 
-    # Set the game clock tick rate
+    # Set the games clock tick rate
     clock.tick(60)
 
-# End the game
+# End the games
 pygame.quit()
