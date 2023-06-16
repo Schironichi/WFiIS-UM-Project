@@ -10,7 +10,7 @@ class FallingBird(gym.Env):
         self.action = self.dist = self.done = self.observation = self.obstacle_rects = self.score_text = None
         self.FONT = pygame.font.Font(None, 36)
         self.screen = pygame.display.set_mode((Window.WIDTH, Window.HEIGHT))
-        self.reward = self.score = self.prev_score = 0
+        self.iterations=self.reward = self.score = self.prev_score = 0
         self.action_space = gym.spaces.Discrete(3)
         self.observation_space = gym.spaces.Box(low=-np.inf, high=np.inf, shape=(6,), dtype=np.float32)
         self.positions = Positions.RANDOM if randomPositions else Positions.STATIC
@@ -63,9 +63,9 @@ class FallingBird(gym.Env):
             reward_d = 1
         else:
             reward_d = -20
-        # E: moving while inside G spot (To test)
-        if self.dist < 51 and action != Actions.NO_ACTION:
-            reward_e = -1
+        # E: moving when player is between obstacles
+        if self.dist < 51 and self.action != Actions.NO_ACTION:
+            reward_e = -10
         else:
             reward_e = 0
         return reward_a + reward_b + reward_c + reward_d + reward_e
@@ -84,6 +84,10 @@ class FallingBird(gym.Env):
 
     def reset(self):
         self.done = self.game_over = False
+        print(f"Score: {self.score}")
+        self.iterations += 1
+        if self.iterations % 2000 == 0:
+            self.positions = [random.randint(0, 700) for _ in range(102)]
         self.score = 0
         self.obstacle_rects = []
         self.player = Player(Window.WIDTH // 2, 0)
@@ -135,7 +139,7 @@ class FallingBird(gym.Env):
         self.screen.fill(Colors.BLACK)
 
         # Draw the player
-        # self.all_sprites.draw(screen)
+        #self.all_sprites.draw(self.screen)
         pygame.draw.rect(self.screen, Colors.BLUE, self.player.rect)
 
         # Draw the obstacles

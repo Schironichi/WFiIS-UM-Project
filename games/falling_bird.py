@@ -56,7 +56,7 @@ NUM_OBSTACLES = 2
 class Player(pygame.sprite.Sprite):
     def __init__(self, x, y):
         super().__init__()
-        self.image = pygame.image.load('data/Kratos.png')
+        self.image = pygame.image.load('../data/Kratos.png')
         self.image = pygame.transform.scale(self.image, (PLAYER_WIDTH, PLAYER_HEIGHT))
         self.rect = self.image.get_rect()
         self.rect.x = x
@@ -100,8 +100,8 @@ def draw(obstacles, player):
     screen.fill(BLACK)
 
     # Draw the player
-    #all_sprites.draw(screen)
-    pygame.draw.rect(screen, BLUE, player.rect)
+    all_sprites.draw(screen)
+    #pygame.draw.rect(screen, BLUE, player.rect)
 
     # Draw the obstacles
     for obstacle_rect in obstacles:

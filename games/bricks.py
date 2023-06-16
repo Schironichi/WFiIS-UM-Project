@@ -43,7 +43,7 @@ OBSTACLE_SPEED = 5
 NUM_OBSTACLES = 5
 
 # Load the player image and scale it to the desired size
-player_image = pygame.image.load('data/Kratos.png')
+player_image = pygame.image.load('../data/Kratos.png')
 player_image = pygame.transform.scale(player_image, (PLAYER_WIDTH, PLAYER_HEIGHT))
 
 # Create the player sprite class
